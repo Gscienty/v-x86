@@ -1,7 +1,7 @@
 #ifndef _INS_
 #define _INS_
 
-typedef ubit8_t modrm_reg_t;
+typedef ubit8_t modrm_t;
 
 #define MOD_RM_R8  0x01
 #define MOD_RM_R16 0x02

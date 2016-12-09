@@ -17,6 +17,8 @@ typedef ubit1_t boolean_t;
 #if 1
 typedef ubit64_t var_addr;
 typedef ubit64_t func_addr;
+
+typedef ubit64_t ubitm_t;
 #endif
 
 #define VARADDR(a) ((var_addr)(&(a)))
