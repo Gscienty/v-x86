@@ -19,8 +19,8 @@ typedef ubit64_t var_addr;
 typedef ubit64_t func_addr;
 #endif
 
-#define GET_VARADDR(a) ((var_addr)(&(a)))
-#define GET_FUNCADDR(a) ((func_addr)(a))
+#define VARADDR(a) ((var_addr)(&(a)))
+#define FUNCADDR(a) ((func_addr)(a))
 
 #define GETBIT(a, b) (!!((a) & (b)))
 #define GETNBIT(a, b) (GETBIT((a), (1 << ((b) - 1))))
