@@ -64,4 +64,11 @@ void ins_and_r8_rm8  (cpu_t *, ram_t *);
 void ins_and_r16_rm16(cpu_t *, ram_t *);
 void ins_and_r32_rm32(cpu_t *, ram_t *);
 
+void ins_arpl(cpu_t *, ram_t *);
+
+void ins_bound16(cpu_t *, ram_t *);
+void ins_bound32(cpu_t *, ram_t *);
+
+void ins_bsf16(cpu_t *, ram_t *);
+
 #endif
