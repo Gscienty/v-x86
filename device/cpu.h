@@ -22,9 +22,9 @@ typedef ubit32_t ins_immediate_t;
 #define INS_PREFIX_SEG_FS 0x64
 #define INS_PREFIX_SEG_GS 0x65
 
-#define INS_PREFIXE_OPSIZE 0x66
+#define INS_PREFIX_OPSIZE 0x66
 
-#define INS_PREFIXE_ADDSIZE 0x67
+#define INS_PREFIX_ADDRSIZE 0x67
 
 
 #define CPU_EFLAGS_CF      0x00000001

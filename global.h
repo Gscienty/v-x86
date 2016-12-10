@@ -47,7 +47,7 @@ typedef ubit64_t ubitm_t;
 #define BIT_SIZE 64
 #endif
 
-#define FILTER(t, m, n) ((t)(n) & m)
+#define FILTER(t, m, n) ((t)(n) & (m))
 
 #define EXEC_FUNC(func) ((func_addr) ? ((*(void (*)(void))(func))()) : 0);
 
