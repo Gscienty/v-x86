@@ -18,7 +18,7 @@ int main() {
 
     cpu.rg.al = 0x02;
     
-    ins_adc_r8_rm8(&cpu, &ram);
+    ins_add_r8_rm8(&cpu, &ram);
     
     printf("%x %x\n", cpu.rg.al, cpu.rg.ah);
     printf("%d", GETBIT(cpu.rg.eflags, CPU_EFLAGS_CF));
