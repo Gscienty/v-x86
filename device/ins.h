@@ -191,4 +191,28 @@ void ins_cmp_r8_rm8    (cpu_t *, ram_t *);
 void ins_cmp_r16_rm16  (cpu_t *, ram_t *);
 void ins_cmp_r32_rm32  (cpu_t *, ram_t *);
 
+void ins_cmps_m8 (cpu_t *, ram_t *);
+void ins_cmps_m16(cpu_t *, ram_t *);
+void ins_cmps_m32(cpu_t *, ram_t *);
+void ins_cmpsb   (cpu_t *, ram_t *);
+void ins_cmpsw   (cpu_t *, ram_t *);
+void ins_cmpsd   (cpu_t *, ram_t *);
+
+void ins_cmpxchg8 (cpu_t *, ram_t *);
+void ins_cmpxchg16(cpu_t *, ram_t *);
+void ins_cmpxchg32(cpu_t *, ram_t *);
+
+void ins_cmpxchg8b(cpu_t *, ram_t *);
+//cpuid
+void ins_cwd(cpu_t *);
+void ins_cdq(cpu_t *);
+
+void ins_daa(cpu_t *);
+void ins_das(cpu_t *);
+
+void ins_dec_rm8 (cpu_t *, ram_t *);
+void ins_dec_rm16(cpu_t *, ram_t *);
+void ins_dec_rm32(cpu_t *, ram_t *);
+void ins_dec_r16 (cpu_t *);
+void ins_dec_r32 (cpu_t *);
 #endif
