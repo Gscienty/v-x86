@@ -190,15 +190,15 @@ void ins_cdq(cpu_t *cpu) { cpu->rg.edx = GETNBIT(cpu->rg.eax, 32) ? 0xffffffff :
     else { SETBIT(cpu->rg.eflags, CPU_EFLAGS_AF); }\
     if((cpu->rg.al & 0xf0) > 0x90 || GETBIT(cpu->rg.eflags, CPU_EFLAGS_CF)) {\
         cpu->rg.al += f ? 0x60 : -0x60;\
-        SETBIT(cpu->eflags, CPU_EFLAGS_CF);\
+        SETBIT(cpu->rg.eflags, CPU_EFLAGS_CF);\
     }\
-    else { CLRBIT(cpu->eflags, CPU_EFLAGS_CF); }
+    else { CLRBIT(cpu->rg.eflags, CPU_EFLAGS_CF); }
 
 void ins_daa(cpu_t *cpu) { INS_DAX(TRUE ) }
 void ins_das(cpu_t *cpu) { INS_DAX(FALSE) }
 
 #define INS_DEC_RMX(t, size, rm, m)\
-    t *dst = (t *)GET_MODRM_RM_ADDR(cpu, ram, rm);\
+    t *dst = GET_MODRM_RM_ADDR(cpu, ram, t, rm);\
     t origin_dst = *dst;\
     *dst -= 0x01;\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_SF, GETNBIT(*dst, size));\
@@ -213,7 +213,7 @@ void ins_dec_rm16(cpu_t *cpu, ram_t *ram) { INS_DEC_RMX(ubit16_t, 16, MOD_RM_RM1
 void ins_dec_rm32(cpu_t *cpu, ram_t *ram) { INS_DEC_RMX(ubit32_t, 32, MOD_RM_RM32, UBIT32_MAX) }
 
 #define INS_DEC_RMX(t, size, r, m)\
-    t *dst = (t *)modrm_reg_addr(cpu, rm);\
+    t *dst = (t *)modrm_reg_addr(cpu, r);\
     t origin_dst = *dst;\
     *dst -= 0x01;\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_SF, GETNBIT(*dst, size));\
@@ -225,3 +225,18 @@ void ins_dec_rm32(cpu_t *cpu, ram_t *ram) { INS_DEC_RMX(ubit32_t, 32, MOD_RM_RM3
 
 void ins_dec_r16(cpu_t *cpu) { INS_DEC_RMX(ubit16_t, 16, MOD_RM_R16, UBIT16_MAX) }
 void ins_dec_r32(cpu_t *cpu) { INS_DEC_RMX(ubit32_t, 32, MOD_RM_R32, UBIT32_MAX) }
+
+#define INS_DIV_RM(t1, t2, rm, br, sr1, sr2, max) \
+    t1 dst = br;\
+    t2 src = *GET_MODRM_RM_ADDR(cpu, ram, t2, rm);\
+    if(src == 0) { /*except DE*/ }\
+    t2 temp = dst / src;\
+    if(temp > max) { /*except DE*/ }\
+    else {\
+        sr1 = temp;\
+        sr2 = dst % src;\
+    }
+
+void ins_div_rm8 (cpu_t *cpu, ram_t *ram) { INS_DIV_RM(ubit16_t, ubit8_t , MOD_RM_RM8 , cpu->rg.ax, cpu->rg.al, cpu->rg.ah, UBIT8_MAX) }
+void ins_div_rm16(cpu_t *cpu, ram_t *ram) { INS_DIV_RM(ubit32_t, ubit16_t, MOD_RM_RM16, ((ubit32_t)cpu->rg.dx << 16) | ((ubit32_t)cpu->rg.ax), cpu->rg.ax, cpu->rg.dx, UBIT16_MAX) }
+void ins_div_rm32(cpu_t *cpu, ram_t *ram) { INS_DIV_RM(ubit64_t, ubit32_t, MOD_RM_RM32, ((ubit64_t)cpu->rg.edx << 32) | ((ubit32_t)cpu->rg.eax), cpu->rg.eax, cpu->rg.edx, UBIT32_MAX) }

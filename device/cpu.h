@@ -166,6 +166,7 @@ typedef struct {
     ins_format_t cur_ins;
     boolean_t is_addr32;
     boolean_t is_operand32;
+    boolean_t halt;
 } cpu_t;
 
 extern struct {

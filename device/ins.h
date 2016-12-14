@@ -3,6 +3,7 @@
 
 #include "cpu.h"
 #include "ram.h"
+#include "port.h"
 
 typedef ubit8_t modrm_t;
 
@@ -215,4 +216,95 @@ void ins_dec_rm16(cpu_t *, ram_t *);
 void ins_dec_rm32(cpu_t *, ram_t *);
 void ins_dec_r16 (cpu_t *);
 void ins_dec_r32 (cpu_t *);
+
+void ins_div_rm8 (cpu_t *, ram_t *);
+void ins_div_rm16(cpu_t *, ram_t *);
+void ins_div_rm32(cpu_t *, ram_t *);
+
+//void ins_emms
+
+//void ins_enter
+
+//f2xm1
+//fabs
+//fadd
+//fbld
+//fbstp
+//fchs
+//fclex
+//fcmov
+//fcom
+//fcomi
+//fcos
+//fdec
+//fdiv
+//fdivr
+//ffree
+//ficom
+//fild
+//fincstp
+//finit
+//fist
+//fld
+//fldcw
+//fldenv
+//fmul
+//fnop
+//fpatan
+//fprem
+//fptan
+//frndint
+//frstor
+//fsave
+//fscale
+//fsin
+//fsincos
+//fsqrt
+//fst
+//fstcw
+//fstenv
+//fstsw
+//fsub
+//fsubr
+//ftst
+//fucom
+//fwait
+//fxam
+//fxch
+//fxtract
+//fyl2x
+//fyl2xp1
+
+void ins_halt(cpu_t *);
+
+void ins_idiv_rm8 (cpu_t *, ram_t *);
+void ins_idiv_rm16(cpu_t *, ram_t *);
+void ins_idiv_rm32(cpu_t *, ram_t *);
+
+void ins_imul_rm8         (cpu_t *, ram_t *);
+void ins_imul_rm16        (cpu_t *, ram_t *);
+void ins_imul_rm32        (cpu_t *, ram_t *);
+void ins_imul_r_rm16      (cpu_t *, ram_t *);
+void ins_imul_r_rm32      (cpu_t *, ram_t *);
+void ins_imul_r_rm16_imm8 (cpu_t *, ram_t *);
+void ins_imul_r_rm32_imm8 (cpu_t *, ram_t *);
+void ins_imul_r_rm16_imm16(cpu_t *, ram_t *);
+void ins_imul_r_rm32_imm32(cpu_t *, ram_t *);
+void ins_imul_r16_imm8    (cpu_t *, ram_t *);
+void ins_imul_r32_imm8    (cpu_t *, ram_t *);
+void ins_imul_r16_imm16   (cpu_t *, ram_t *);
+void ins_imul_r32_imm32   (cpu_t *, ram_t *);
+
+void ins_in_al_imm8 (cpu_t *, ram_t *, port_t *);
+void ins_in_ax_imm8 (cpu_t *, ram_t *, port_t *);
+void ins_in_eax_imm8(cpu_t *, ram_t *, port_t *);
+void ins_in_al_dx   (cpu_t *, ram_t *, port_t *);
+void ins_in_ax_dx   (cpu_t *, ram_t *, port_t *);
+void ins_in_eax_dx  (cpu_t *, ram_t *, port_t *);
+
+void ins_inc_rm8 (cpu_t *, ram_t *);
+void ins_inc_rm16(cpu_t *, ram_t *);
+void ins_inc_rm32(cpu_t *, ram_t *);
+void ins_inc_r16 (cpu_t *, ram_t *);
+void ins_inc_r32 (cpu_t *, ram_t *);
 #endif

@@ -42,6 +42,8 @@ typedef ubit64_t ubitm_t;
 #define UBIT48_MAX 0x0000ffffffffffff
 #define UBIT64_MAX 0xffffffffffffffff
 
+#define NULL 0
+
 #if 1
 #define UBIT_MAX UBIT64_MAX
 #define BIT_SIZE 64
