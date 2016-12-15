@@ -307,4 +307,11 @@ void ins_inc_rm16(cpu_t *, ram_t *);
 void ins_inc_rm32(cpu_t *, ram_t *);
 void ins_inc_r16 (cpu_t *, ram_t *);
 void ins_inc_r32 (cpu_t *, ram_t *);
+
+void ins_ins    (cpu_t *, ram_t *, port_t *);
+void ins_ins_m16(cpu_t *, ram_t *, port_t *);
+void ins_ins_m32(cpu_t *, ram_t *, port_t *);
+void ins_insb   (cpu_t *, ram_t *, port_t *);
+void ins_insw   (cpu_t *, ram_t *, port_t *);
+void ins_insd   (cpu_t *, ram_t *, port_t *);
 #endif

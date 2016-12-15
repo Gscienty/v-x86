@@ -84,66 +84,54 @@ void ins_cmovs32  (cpu_t *cpu, ram_t *ram) { I_C( C_F(F_S)                      
 void ins_cmovz16  (cpu_t *cpu, ram_t *ram) { I_C( C_F(F_Z)                         , ubit16_t, R16, RM16); }
 void ins_cmovz32  (cpu_t *cpu, ram_t *ram) { I_C( C_F(F_Z)                         , ubit32_t, R32, RM32); }
 
-#define INS_CMP(p1, p2, t, l, m) \
+#define INS_CMP(p1, p2, t, m) \
     t op1 = p1;\
     t op2 = p2;\
     t temp = op1 - op2;\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_CF, op1 < op2);\
-    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_OF, GETNBIT(op1, l) != GETNBIT(op2, l) && GETNBIT(temp, l) == GETNBIT(op2, l));\
-    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_SF, GETNBIT(temp, l));\
+    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_OF, GETNBIT(op1, sizeof(t) << 3) != GETNBIT(op2, sizeof(t) << 3) && GETNBIT(temp, sizeof(t) << 3) == GETNBIT(op2, sizeof(t) << 3));\
+    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_SF, GETNBIT(temp, sizeof(t) << 3));\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_AF, GETBIT((op1 ^ op2 ^ temp), 0x10));\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_AF, GETBIT((op1 ^ op2 ^ temp), 0x10));\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_PF, calc_pf(m, temp));
 
-#define CMP_RM_IMM(t, t2, l, rm, m) INS_CMP(*(t *)(GET_MODRM_RM_ADDR(cpu, ram, t, rm)), (t)*(t2 *)cpu->cur_ins.immediate, t, l, m)
-#define CMP_RM_R(t, l, rm, r, m) INS_CMP(*(t *)GET_MODRM_RM_ADDR(cpu, ram, t, rm), *(t *)modrm_reg_addr(cpu, r), t, l, m);
-#define CMP_R_RM(t, l, rm, r, m) INS_CMP(*(t *)modrm_reg_addr(cpu, r), *(t *)GET_MODRM_RM_ADDR(cpu, ram, t, rm), t, l, m);
+#define CMP_RM_IMM(t, t2, rm, m) INS_CMP(*(t *)GET_MODRM_RM_ADDR(cpu, ram, t, rm), (t)*(t2 *)cpu->cur_ins.immediate, t, m)
+#define CMP_RM_R(t, rm, r, m) INS_CMP(*(t *)GET_MODRM_RM_ADDR(cpu, ram, t, rm), *(t *)modrm_reg_addr(cpu, r), t, m);
+#define CMP_R_RM(t, rm, r, m) INS_CMP(*(t *)modrm_reg_addr(cpu, r), *(t *)GET_MODRM_RM_ADDR(cpu, ram, t, rm), t, m);
 
-void ins_cmp_al_imm8   (cpu_t *cpu) { INS_CMP(cpu->rg.al , (ubit8_t )cpu->cur_ins.immediate, ubit8_t , 8 , UBIT8_MAX ) }
-void ins_cmp_ax_imm16  (cpu_t *cpu) { INS_CMP(cpu->rg.ax , (ubit16_t)cpu->cur_ins.immediate, ubit16_t, 16, UBIT16_MAX) }
-void ins_cmp_eax_imm32 (cpu_t *cpu) { INS_CMP(cpu->rg.eax, (ubit32_t)cpu->cur_ins.immediate, ubit32_t, 32, UBIT32_MAX) }
-void ins_cmp_rm8_imm8  (cpu_t *cpu, ram_t *ram) { CMP_RM_IMM(ubit8_t , ubit8_t , 8 , MOD_RM_RM8 , UBIT8_MAX ) }
-void ins_cmp_rm16_imm16(cpu_t *cpu, ram_t *ram) { CMP_RM_IMM(ubit16_t, ubit16_t, 16, MOD_RM_RM16, UBIT16_MAX) }
-void ins_cmp_rm32_imm32(cpu_t *cpu, ram_t *ram) { CMP_RM_IMM(ubit32_t, ubit32_t, 32, MOD_RM_RM32, UBIT32_MAX) }
-void ins_cmp_rm16_imm8 (cpu_t *cpu, ram_t *ram) { CMP_RM_IMM(ubit16_t, bit8_t  , 16, MOD_RM_RM16, UBIT16_MAX) }
-void ins_cmp_rm32_imm8 (cpu_t *cpu, ram_t *ram) { CMP_RM_IMM(ubit32_t, bit8_t  , 32, MOD_RM_RM32, UBIT32_MAX) }
-void ins_cmp_rm8_r8    (cpu_t *cpu, ram_t *ram) { CMP_RM_R(ubit8_t , 8 , MOD_RM_RM8 , MOD_RM_R8 , UBIT8_MAX ) }
-void ins_cmp_rm16_r16  (cpu_t *cpu, ram_t *ram) { CMP_RM_R(ubit16_t, 16, MOD_RM_RM16, MOD_RM_R16, UBIT16_MAX) }
-void ins_cmp_rm32_r32  (cpu_t *cpu, ram_t *ram) { CMP_RM_R(ubit32_t, 32, MOD_RM_RM32, MOD_RM_R32, UBIT32_MAX) }
-void ins_cmp_r8_rm8    (cpu_t *cpu, ram_t *ram) { CMP_R_RM(ubit8_t , 8 , MOD_RM_RM8 , MOD_RM_R8 , UBIT8_MAX ) }
-void ins_cmp_r16_rm16  (cpu_t *cpu, ram_t *ram) { CMP_R_RM(ubit16_t, 16, MOD_RM_RM16, MOD_RM_R16, UBIT16_MAX) }
-void ins_cmp_r32_rm32  (cpu_t *cpu, ram_t *ram) { CMP_R_RM(ubit32_t, 32, MOD_RM_RM32, MOD_RM_R32, UBIT32_MAX) }
+void ins_cmp_al_imm8   (cpu_t *cpu) { INS_CMP(cpu->rg.al , (ubit8_t )cpu->cur_ins.immediate, ubit8_t , UBIT8_MAX ) }
+void ins_cmp_ax_imm16  (cpu_t *cpu) { INS_CMP(cpu->rg.ax , (ubit16_t)cpu->cur_ins.immediate, ubit16_t, UBIT16_MAX) }
+void ins_cmp_eax_imm32 (cpu_t *cpu) { INS_CMP(cpu->rg.eax, (ubit32_t)cpu->cur_ins.immediate, ubit32_t, UBIT32_MAX) }
+void ins_cmp_rm8_imm8  (cpu_t *cpu, ram_t *ram) { CMP_RM_IMM(ubit8_t , ubit8_t , MOD_RM_RM8 , UBIT8_MAX ) }
+void ins_cmp_rm16_imm16(cpu_t *cpu, ram_t *ram) { CMP_RM_IMM(ubit16_t, ubit16_t, MOD_RM_RM16, UBIT16_MAX) }
+void ins_cmp_rm32_imm32(cpu_t *cpu, ram_t *ram) { CMP_RM_IMM(ubit32_t, ubit32_t, MOD_RM_RM32, UBIT32_MAX) }
+void ins_cmp_rm16_imm8 (cpu_t *cpu, ram_t *ram) { CMP_RM_IMM(ubit16_t, bit8_t  , MOD_RM_RM16, UBIT16_MAX) }
+void ins_cmp_rm32_imm8 (cpu_t *cpu, ram_t *ram) { CMP_RM_IMM(ubit32_t, bit8_t  , MOD_RM_RM32, UBIT32_MAX) }
+void ins_cmp_rm8_r8    (cpu_t *cpu, ram_t *ram) { CMP_RM_R(ubit8_t , MOD_RM_RM8 , MOD_RM_R8 , UBIT8_MAX ) }
+void ins_cmp_rm16_r16  (cpu_t *cpu, ram_t *ram) { CMP_RM_R(ubit16_t, MOD_RM_RM16, MOD_RM_R16, UBIT16_MAX) }
+void ins_cmp_rm32_r32  (cpu_t *cpu, ram_t *ram) { CMP_RM_R(ubit32_t, MOD_RM_RM32, MOD_RM_R32, UBIT32_MAX) }
+void ins_cmp_r8_rm8    (cpu_t *cpu, ram_t *ram) { CMP_R_RM(ubit8_t , MOD_RM_RM8 , MOD_RM_R8 , UBIT8_MAX ) }
+void ins_cmp_r16_rm16  (cpu_t *cpu, ram_t *ram) { CMP_R_RM(ubit16_t, MOD_RM_RM16, MOD_RM_R16, UBIT16_MAX) }
+void ins_cmp_r32_rm32  (cpu_t *cpu, ram_t *ram) { CMP_R_RM(ubit32_t, MOD_RM_RM32, MOD_RM_R32, UBIT32_MAX) }
 
-#define INS_CMPS_M(t, l, m) \ 
+#define INS_CMPS_M(t, m) \ 
     if(cpu->is_addr32) {\
-        INS_CMP(*(t *)RAM_SEG_GETADDR((*ram), cpu->rg.ds.base, cpu->rg.esi), *(t *)(cpu->rg.es.base, cpu->rg.edi), t, l, m)\
-        if(GETBIT(cpu->rg.eflags, CPU_EFLAGS_DF)) {\
-            cpu->rg.esi -= l / 8;\
-            cpu->rg.edi -= l / 8;\
-        }\
-        else {\
-            cpu->rg.esi += l / 8;\
-            cpu->rg.edi += l / 8;\
-        }\
+        INS_CMP(*(t *)RAM_SEG_GETADDR((*ram), cpu->rg.ds.base, cpu->rg.esi), *(t *)(cpu->rg.es.base, cpu->rg.edi), t, m)\
+        cpu->rg.esi += GETBIT(cpu->rg.eflags, CPU_EFLAGS_DF) ? -sizeof(t) : sizeof(t);\
+        cpu->rg.edi += GETBIT(cpu->rg.eflags, CPU_EFLAGS_DF) ? -sizeof(t) : sizeof(t);\
     }\
     else {\
-        INS_CMP(*(t *)RAM_SEG_GETADDR((*ram), cpu->rg.ds.base, cpu->rg.si), *(t *)(cpu->rg.es.base, cpu->rg.di), t, l, m)\
-        if(GETBIT(cpu->rg.eflags, CPU_EFLAGS_DF)) {\
-            cpu->rg.si -= l / 8;\
-            cpu->rg.di -= l / 8;\
-        }\
-        else {\
-            cpu->rg.si += l / 8;\
-            cpu->rg.di += l / 8;\
-        }\
+        INS_CMP(*(t *)RAM_SEG_GETADDR((*ram), cpu->rg.ds.base, cpu->rg.si), *(t *)(cpu->rg.es.base, cpu->rg.di), t, m)\
+        cpu->rg.si += GETBIT(cpu->rg.eflags, CPU_EFLAGS_DF) ? -sizeof(t) : sizeof(t);\
+        cpu->rg.di += GETBIT(cpu->rg.eflags, CPU_EFLAGS_DF) ? -sizeof(t) : sizeof(t);\
     }
 
-void ins_cmps_m8 (cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit8_t , 8 , UBIT8_MAX ) }
-void ins_cmps_m16(cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit16_t, 16, UBIT16_MAX) }
-void ins_cmps_m32(cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit32_t, 32, UBIT32_MAX) }
-void ins_cmpsb   (cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit8_t , 8 , UBIT8_MAX ) }
-void ins_cmpsw   (cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit16_t, 16, UBIT16_MAX) }
-void ins_cmpsd   (cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit32_t, 32, UBIT32_MAX) }
+void ins_cmps_m8 (cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit8_t , UBIT8_MAX ) }
+void ins_cmps_m16(cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit16_t, UBIT16_MAX) }
+void ins_cmps_m32(cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit32_t, UBIT32_MAX) }
+void ins_cmpsb   (cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit8_t , UBIT8_MAX ) }
+void ins_cmpsw   (cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit16_t, UBIT16_MAX) }
+void ins_cmpsd   (cpu_t *cpu, ram_t *ram) { INS_CMPS_M(ubit32_t, UBIT32_MAX) }
 
 #define INS_CMPXCHG(t, rm, r, rgt) \
     t *rm_addr = GET_MODRM_RM_ADDR(cpu, ram, t, rm);\
@@ -197,34 +185,34 @@ void ins_cdq(cpu_t *cpu) { cpu->rg.edx = GETNBIT(cpu->rg.eax, 32) ? 0xffffffff :
 void ins_daa(cpu_t *cpu) { INS_DAX(TRUE ) }
 void ins_das(cpu_t *cpu) { INS_DAX(FALSE) }
 
-#define INS_DEC_RMX(t, size, rm, m)\
+#define INS_DEC_RMX(t, rm, m)\
     t *dst = GET_MODRM_RM_ADDR(cpu, ram, t, rm);\
     t origin_dst = *dst;\
     *dst -= 0x01;\
-    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_SF, GETNBIT(*dst, size));\
+    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_SF, GETNBIT(*dst, sizeof(t) << 3));\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_ZF, !GETBIT(*dst, m));\
-    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_OF, GETNBIT(origin_dst, size) && !GETNBIT(*dst, size));\
-    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_AF, GETNBIT(origin_dst, size) && !GETNBIT(*dst, size));\
+    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_OF, GETNBIT(origin_dst, sizeof(t) << 3) && !GETNBIT(*dst, sizeof(t) << 3));\
+    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_AF, GETNBIT(origin_dst, sizeof(t) << 3) && !GETNBIT(*dst, sizeof(t) << 3));\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_AF, GETBIT((origin_dst ^ 0x01 ^ *dst), 0x10));\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_PF, calc_pf(m, *dst));\
 
-void ins_dec_rm8 (cpu_t *cpu, ram_t *ram) { INS_DEC_RMX(ubit8_t , 8 , MOD_RM_RM8 , UBIT8_MAX ) }
-void ins_dec_rm16(cpu_t *cpu, ram_t *ram) { INS_DEC_RMX(ubit16_t, 16, MOD_RM_RM16, UBIT16_MAX) }
-void ins_dec_rm32(cpu_t *cpu, ram_t *ram) { INS_DEC_RMX(ubit32_t, 32, MOD_RM_RM32, UBIT32_MAX) }
+void ins_dec_rm8 (cpu_t *cpu, ram_t *ram) { INS_DEC_RMX(ubit8_t , MOD_RM_RM8 , UBIT8_MAX ) }
+void ins_dec_rm16(cpu_t *cpu, ram_t *ram) { INS_DEC_RMX(ubit16_t, MOD_RM_RM16, UBIT16_MAX) }
+void ins_dec_rm32(cpu_t *cpu, ram_t *ram) { INS_DEC_RMX(ubit32_t, MOD_RM_RM32, UBIT32_MAX) }
 
-#define INS_DEC_RMX(t, size, r, m)\
+#define INS_DEC_RX(t, r, m)\
     t *dst = (t *)modrm_reg_addr(cpu, r);\
     t origin_dst = *dst;\
     *dst -= 0x01;\
-    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_SF, GETNBIT(*dst, size));\
+    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_SF, GETNBIT(*dst, sizeof(t) << 3));\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_ZF, !GETBIT(*dst, m));\
-    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_OF, GETNBIT(origin_dst, size) && !GETNBIT(*dst, size));\
-    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_AF, GETNBIT(origin_dst, size) && !GETNBIT(*dst, size));\
+    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_OF, GETNBIT(origin_dst, sizeof(t) << 3) && !GETNBIT(*dst, sizeof(t) << 3));\
+    ALTBIT(cpu->rg.eflags, CPU_EFLAGS_AF, GETNBIT(origin_dst, sizeof(t) << 3) && !GETNBIT(*dst, sizeof(t) << 3));\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_AF, GETBIT((origin_dst ^ 0x01 ^ *dst), 0x10));\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_PF, calc_pf(m, *dst));\
 
-void ins_dec_r16(cpu_t *cpu) { INS_DEC_RMX(ubit16_t, 16, MOD_RM_R16, UBIT16_MAX) }
-void ins_dec_r32(cpu_t *cpu) { INS_DEC_RMX(ubit32_t, 32, MOD_RM_R32, UBIT32_MAX) }
+void ins_dec_r16(cpu_t *cpu) { INS_DEC_RX(ubit16_t, MOD_RM_R16, UBIT16_MAX) }
+void ins_dec_r32(cpu_t *cpu) { INS_DEC_RX(ubit32_t, MOD_RM_R32, UBIT32_MAX) }
 
 #define INS_DIV_RM(t1, t2, rm, br, sr1, sr2, max) \
     t1 dst = br;\
