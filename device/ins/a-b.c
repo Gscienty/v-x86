@@ -62,18 +62,17 @@ void ins_aas(cpu_t *cpu) {
             TRUE : (dst < op1 || dst < op2)));\
     ALTBIT(cpu->rg.eflags, CPU_EFLAGS_PF, calc_pf(UBIT8_MAX, dst));
 
-#define INS_ADD_AZ_IZ(t, r, s, dc)\
+#define INS_ADD_AZ_IZ(t, r, dc)\
     t op1 = r;\
     t op2 = (t)cpu->cur_ins.immediate;\
-    INC_ADD(r, s, dc);
+    INC_ADD(r, sizeof(t) << 3, dc);
 
-void ins_adc_al_imm8  (cpu_t *cpu) { INS_ADD_AZ_IZ(ubit8_t , cpu->rg.al , 8 , TRUE) }
-void ins_adc_ax_imm16 (cpu_t *cpu) { INS_ADD_AZ_IZ(ubit16_t, cpu->rg.ax , 16, TRUE) }
-void ins_adc_eax_imm32(cpu_t *cpu) { INS_ADD_AZ_IZ(ubit32_t, cpu->rg.eax, 32, TRUE) }
-
-void ins_add_al_imm8  (cpu_t *cpu) { INS_ADD_AZ_IZ(ubit8_t , cpu->rg.al , 8 , FALSE) }
-void ins_add_ax_imm16 (cpu_t *cpu) { INS_ADD_AZ_IZ(ubit16_t, cpu->rg.ax , 16, FALSE) }
-void ins_add_eax_imm32(cpu_t *cpu) { INS_ADD_AZ_IZ(ubit32_t, cpu->rg.eax, 32, FALSE) }
+void ins_adc_al_imm8  (cpu_t *cpu) { INS_ADD_AZ_IZ(ubit8_t , cpu->rg.al , TRUE ) }
+void ins_adc_ax_imm16 (cpu_t *cpu) { INS_ADD_AZ_IZ(ubit16_t, cpu->rg.ax , TRUE ) }
+void ins_adc_eax_imm32(cpu_t *cpu) { INS_ADD_AZ_IZ(ubit32_t, cpu->rg.eax, TRUE ) }
+void ins_add_al_imm8  (cpu_t *cpu) { INS_ADD_AZ_IZ(ubit8_t , cpu->rg.al , FALSE) }
+void ins_add_ax_imm16 (cpu_t *cpu) { INS_ADD_AZ_IZ(ubit16_t, cpu->rg.ax , FALSE) }
+void ins_add_eax_imm32(cpu_t *cpu) { INS_ADD_AZ_IZ(ubit32_t, cpu->rg.eax, FALSE) }
 
 #define INS_ADD_RMX_IMMY(t1, t2, t1s, t2f, dc)\
     t1 *dst_addr = GET_MODRM_RM_ADDR(cpu, ram, t1, t1s);\

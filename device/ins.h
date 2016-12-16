@@ -314,4 +314,12 @@ void ins_ins_m32(cpu_t *, ram_t *, port_t *);
 void ins_insb   (cpu_t *, ram_t *, port_t *);
 void ins_insw   (cpu_t *, ram_t *, port_t *);
 void ins_insd   (cpu_t *, ram_t *, port_t *);
+
+void ins_int(cpu_t *, ram_t *);//?
+
+//invd
+//invlpg
+//iret
+
+void ins_ja(cpu_t *);
 #endif
